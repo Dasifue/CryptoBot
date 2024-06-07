@@ -84,11 +84,10 @@ async def send_coin_info(callback_query: types.CallbackQuery) -> None:
     data = await coin_info(coin_id=coin_id)
     if data is not None:
 
-        image_url = data.pop('image')
         await bot.send_photo(
             chat_id=callback_query.from_user.id,
-            photo=image_url,
-            caption=str(data)
+            photo=data[1],
+            caption=data[0]
         )
     else:
         await bot.send_message(

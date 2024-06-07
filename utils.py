@@ -31,7 +31,7 @@ async def coins_list(
                 yield coin['id'], coin['name']
 
 
-async def coin_info(coin_id: str) -> dict[typing.Any, typing.Any] | None:
+async def coin_info(coin_id: str) -> tuple[str, str] | None:
     "Корутина получает данные об конкретной крипте"
     url = f"https://api.coingecko.com/api/v3/coins/{coin_id}"
 
@@ -42,14 +42,14 @@ async def coin_info(coin_id: str) -> dict[typing.Any, typing.Any] | None:
 
             data = await response.json()
 
-            return {
-                'name': data['name'],
-                'name_rus': data['localization']['ru'],
-                'link': data['links']['homepage'],
-                'image': data['image']['large'],
-                'current_price_usd': data['tickers'][0]['last'],
-                'volume': data['tickers'][0]['volume'],
-            }
+            text = f"{data['name']} ({data['web_slug']})\n{data['links']['homepage'][0]}\n"
+            text += f"Current price = ${data['market_data']['current_price']['usd']}\n"
+            text += f"Price change 24h = ${data['market_data']['price_change_24h']}\n"
+            text += f"{data['description']['en']}"
+
+            if len(text) > 1000:
+                text = text[:1000] + "..."
+            return text, data['image']['large']
 
 
 async def get_image(url: str) -> bytes | None:
